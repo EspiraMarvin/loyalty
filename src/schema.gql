@@ -1,0 +1,120 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CashbackConfiguration {
+  CashbackConfigurationTiers: [CashbackConfigurationTier!]!
+  Merchant: Merchant!
+  Review: Review
+  deletedAt: DateTime
+  eligibleCustomerTypes: [String!]!
+  endDate: DateTime
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  netCashbackBudget: Float!
+  startDate: DateTime
+  usedCashbackBudget: Float!
+}
+
+type CashbackConfigurationTier {
+  Review: Review
+  deletedAt: DateTime
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  percentage: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ExclusiveOffer {
+  Merchant: Merchant
+  Review: Review
+  deletedAt: DateTime
+  description: String!
+  eligibleCustomerTypes: [String!]!
+  endDate: DateTime!
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  netOfferBudget: Float!
+  startDate: DateTime!
+  usedOfferBudget: Float!
+}
+
+type LoyaltyProgram {
+  LoyaltyTiers: [LoyaltyTier!]!
+  Merchant: Merchant
+  MerchantLoyaltyRewards: [MerchantLoyaltyReward!]!
+  Review: Review
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  pointsIssuedLimit: Float
+  pointsUsedInPeriod: Float!
+}
+
+type LoyaltyTier {
+  Review: Review
+  deletedAt: DateTime
+  id: ID!
+  isActive: Boolean!
+  minCustomerType: String!
+  name: String!
+}
+
+type Merchant {
+  LoyaltyProgram: LoyaltyProgram
+  businessName: String!
+  category: String!
+  description: String
+  id: ID!
+  status: String!
+}
+
+type MerchantLoyaltyReward {
+  Review: Review
+  description: String
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  pointsCost: Float!
+}
+
+type OfferSummary {
+  outlets: [Outlet!]!
+  totalCount: Float!
+}
+
+input OffersFilterInput {
+  category: String
+  maxPercentage: Float
+  minPercentage: Float
+  search: String
+  userId: String
+}
+
+type Outlet {
+  CashbackConfigurations: [CashbackConfiguration!]!
+  ExclusiveOffers: [ExclusiveOffer!]!
+  Merchant: Merchant!
+  Review: Review
+  description: String
+  id: ID!
+  isActive: Boolean!
+  name: String!
+}
+
+type Query {
+  """Get all available offers filtered by various criteria"""
+  offers(filter: OffersFilterInput): OfferSummary!
+}
+
+type Review {
+  id: ID!
+  status: String!
+}
