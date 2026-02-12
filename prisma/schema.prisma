@@ -5,20 +5,173 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// enum OrderedCustomerTypes = {
-//  NonCustomer
-//  New
-//  Infrequent
-//  Occasional
-//  Regular
-//  Vip
-// }
+// Outlet represents a physical location
+model Outlet {
+  id                     String                  @id
+  name                   String
+  description            String?
+  isActive               Boolean
+  merchantId             String
+  Merchant               Merchant                @relation(fields: [merchantId], references: [id])
+  PaybillOrTills         PaybillOrTill[]
+  CashbackConfigurations CashbackConfiguration[] // Many-to-many
+  ExclusiveOffers        ExclusiveOffer[] // Many-to-many
+  Review                 Review?                 @relation(fields: [reviewId], references: [id])
+  reviewId               String?                 @unique
+}
 
+// Merchant represents a business
+model Merchant {
+  id                     String                  @id
+  businessName           String
+  description            String?
+  status                 String // e.g., "Active", "Pending"
+  category               String
+  LoyaltyProgram         LoyaltyProgram? // One-to-one
+  CashbackConfigurations CashbackConfiguration[]
+  ExclusiveOffers        ExclusiveOffer[]
+  Outlets                Outlet[]
+  CustomerTypes          CustomerType[]
+}
+
+// Cashback Configuration
+model CashbackConfiguration {
+  id                    String    @id
+  name                  String
+  startDate             DateTime?
+  endDate               DateTime?
+  isActive              Boolean   @default(true)
+  deletedAt             DateTime?
+  eligibleCustomerTypes String[] // e.g., ["All"], ["VIP", "Regular"]
+  merchantId            String
+  Merchant              Merchant  @relation(fields: [merchantId], references: [id])
+  Outlets               Outlet[] // Many-to-many
+  Review                Review?   @relation(fields: [reviewId], references: [id])
+  reviewId              String?   @unique
+
+  // Budget tracking
+  netCashbackBudget          Decimal                     @default(0.0)
+  usedCashbackBudget         Decimal                     @default(0.0)
+  CashbackConfigurationTiers CashbackConfigurationTier[]
+}
+
+// Exclusive Offer
+model ExclusiveOffer {
+  id                    String    @id
+  name                  String
+  description           String
+  startDate             DateTime
+  endDate               DateTime
+  isActive              Boolean   @default(true)
+  deletedAt             DateTime?
+  eligibleCustomerTypes String[] // e.g., ["New", "Infrequent"]
+  merchantId            String?
+  Merchant              Merchant? @relation(fields: [merchantId], references: [id])
+  Outlets               Outlet[] // Many-to-many
+  Review                Review?   @relation(fields: [reviewId], references: [id])
+  reviewId              String?   @unique
+
+  // Budget tracking
+  netOfferBudget  Decimal @default(0.0)
+  usedOfferBudget Decimal @default(0.0)
+}
+
+// Loyalty Program
+model LoyaltyProgram {
+  id                     String                  @id
+  name                   String
+  isActive               Boolean                 @default(true)
+  merchantId             String?                 @unique
+  Merchant               Merchant?               @relation(fields: [merchantId], references: [id])
+  LoyaltyTiers           LoyaltyTier[]
+  MerchantLoyaltyRewards MerchantLoyaltyReward[]
+  Review                 Review?                 @relation(fields: [reviewId], references: [id])
+  reviewId               String?                 @unique
+
+  // Limits
+  pointsUsedInPeriod Decimal  @default(0)
+  pointsIssuedLimit  Decimal?
+}
+
+// Loyalty Tier
+model LoyaltyTier {
+  id               String         @id
+  name             String
+  isActive         Boolean        @default(true)
+  deletedAt        DateTime?
+  minCustomerType  String // e.g., "New", "Regular", "VIP"
+  loyaltyProgramId String
+  LoyaltyProgram   LoyaltyProgram @relation(fields: [loyaltyProgramId], references: [id])
+  Review           Review?        @relation(fields: [reviewId], references: [id])
+  reviewId         String?        @unique
+}
+
+// CustomerType tracks user's relationship with merchants
+model CustomerType {
+  id         String   @id
+  userId     String
+  merchantId String
+  type       String // e.g., "New", "Regular", "VIP"
+  Merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+// Review model
+model Review {
+  id                        String                     @id
+  status                    String // "Approved", "Pending", "Rejected"
+  Outlet                    Outlet?
+  CashbackConfiguration     CashbackConfiguration?
+  ExclusiveOffer            ExclusiveOffer?
+  LoyaltyProgram            LoyaltyProgram?
+  LoyaltyTier               LoyaltyTier?
+  PaybillOrTill             PaybillOrTill?
+  CashbackConfigurationTier CashbackConfigurationTier?
+  MerchantLoyaltyReward     MerchantLoyaltyReward?
+}
+
+// PaybillOrTill represents payment methods for outlets
+model PaybillOrTill {
+  id        String    @id
+  name      String
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+  outletId  String
+  Outlet    Outlet    @relation(fields: [outletId], references: [id])
+  Review    Review?   @relation(fields: [reviewId], references: [id])
+  reviewId  String?   @unique
+}
+
+// CashbackConfigurationTier represents different cashback percentage tiers
+model CashbackConfigurationTier {
+  id                      String                @id
+  name                    String
+  percentage              Decimal
+  isActive                Boolean               @default(true)
+  deletedAt               DateTime?
+  cashbackConfigurationId String
+  CashbackConfiguration   CashbackConfiguration @relation(fields: [cashbackConfigurationId], references: [id])
+  Review                  Review?               @relation(fields: [reviewId], references: [id])
+  reviewId                String?               @unique
+}
+
+// MerchantLoyaltyReward represents rewards in a loyalty program
+model MerchantLoyaltyReward {
+  id               String         @id
+  name             String
+  description      String?
+  pointsCost       Decimal
+  isActive         Boolean        @default(true)
+  loyaltyProgramId String
+  LoyaltyProgram   LoyaltyProgram @relation(fields: [loyaltyProgramId], references: [id])
+  Review           Review?        @relation(fields: [reviewId], references: [id])
+  reviewId         String?        @unique
+}
