@@ -6,6 +6,8 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OffersModule } from './offers/offers.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { OffersModule } from './offers/offers.module';
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       context: ({ req }) => ({ req }),
     }),
+    PrismaModule,
+    RedisModule,
     OffersModule,
   ],
   controllers: [AppController],
