@@ -27,6 +27,10 @@ model Outlet {
   ExclusiveOffers        ExclusiveOffer[] // Many-to-many
   Review                 Review?                 @relation(fields: [reviewId], references: [id])
   reviewId               String?                 @unique
+
+  @@index([isActive, merchantId])
+  @@index([merchantId, isActive])
+  @@index([reviewId])
 }
 
 // Merchant represents a business
@@ -41,48 +45,58 @@ model Merchant {
   ExclusiveOffers        ExclusiveOffer[]
   Outlets                Outlet[]
   CustomerTypes          CustomerType[]
+
+  @@index([status, category])
+  @@index([status])
 }
 
 // Cashback Configuration
 model CashbackConfiguration {
-  id                    String    @id
+  id                    String                         @id
   name                  String
   startDate             DateTime?
   endDate               DateTime?
-  isActive              Boolean   @default(true)
+  isActive              Boolean                        @default(true)
   deletedAt             DateTime?
-  eligibleCustomerTypes String[] // e.g., ["All"], ["VIP", "Regular"]
+  EligibleCustomerTypes CashbackEligibleCustomerType[]
   merchantId            String
-  Merchant              Merchant  @relation(fields: [merchantId], references: [id])
+  Merchant              Merchant                       @relation(fields: [merchantId], references: [id])
   Outlets               Outlet[] // Many-to-many
-  Review                Review?   @relation(fields: [reviewId], references: [id])
-  reviewId              String?   @unique
+  Review                Review?                        @relation(fields: [reviewId], references: [id])
+  reviewId              String?                        @unique
 
   // Budget tracking
   netCashbackBudget          Decimal                     @default(0.0)
   usedCashbackBudget         Decimal                     @default(0.0)
   CashbackConfigurationTiers CashbackConfigurationTier[]
+
+  @@index([merchantId, isActive])
+  @@index([isActive, deletedAt])
 }
 
 // Exclusive Offer
 model ExclusiveOffer {
-  id                    String    @id
+  id                    String                               @id
   name                  String
   description           String
   startDate             DateTime
   endDate               DateTime
-  isActive              Boolean   @default(true)
+  isActive              Boolean                              @default(true)
   deletedAt             DateTime?
-  eligibleCustomerTypes String[] // e.g., ["New", "Infrequent"]
+  EligibleCustomerTypes ExclusiveOfferEligibleCustomerType[]
   merchantId            String?
-  Merchant              Merchant? @relation(fields: [merchantId], references: [id])
+  Merchant              Merchant?                            @relation(fields: [merchantId], references: [id])
   Outlets               Outlet[] // Many-to-many
-  Review                Review?   @relation(fields: [reviewId], references: [id])
-  reviewId              String?   @unique
+  Review                Review?                              @relation(fields: [reviewId], references: [id])
+  reviewId              String?                              @unique
 
   // Budget tracking
   netOfferBudget  Decimal @default(0.0)
   usedOfferBudget Decimal @default(0.0)
+
+  @@index([merchantId, isActive])
+  @@index([isActive, deletedAt])
+  @@index([startDate, endDate])
 }
 
 // Loyalty Program
@@ -100,6 +114,9 @@ model LoyaltyProgram {
   // Limits
   pointsUsedInPeriod Decimal  @default(0)
   pointsIssuedLimit  Decimal?
+
+  @@index([isActive, merchantId])
+  @@index([reviewId])
 }
 
 // Loyalty Tier
@@ -108,11 +125,16 @@ model LoyaltyTier {
   name             String
   isActive         Boolean        @default(true)
   deletedAt        DateTime?
-  minCustomerType  String // e.g., "New", "Regular", "VIP"
+  minCustomerType  String // e.g., "New", "Regular", "VIP" - for display
+  minRank          Int // Numeric rank for hierarchy: 0=NonCustomer, 1=New, 2=Infrequent, 3=Occasional, 4=Regular, 5=VIP
   loyaltyProgramId String
   LoyaltyProgram   LoyaltyProgram @relation(fields: [loyaltyProgramId], references: [id])
   Review           Review?        @relation(fields: [reviewId], references: [id])
   reviewId         String?        @unique
+
+  @@index([loyaltyProgramId, isActive, minRank])
+  @@index([isActive, deletedAt])
+  @@index([minRank, isActive])
 }
 
 // CustomerType tracks user's relationship with merchants
@@ -121,13 +143,19 @@ model CustomerType {
   userId     String
   merchantId String
   type       String // e.g., "New", "Regular", "VIP"
+  rank       Int // Numeric rank: 0=NonCustomer, 1=New, 2=Infrequent, 3=Occasional, 4=Regular, 5=VIP
   Merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  @@index([userId])
+  @@index([merchantId, userId])
+  @@index([userId, rank])
 }
 
 // Review model
 model Review {
   id                        String                     @id
   status                    String // "Approved", "Pending", "Rejected"
+  // back-relations
   Outlet                    Outlet?
   CashbackConfiguration     CashbackConfiguration?
   ExclusiveOffer            ExclusiveOffer?
@@ -136,6 +164,8 @@ model Review {
   PaybillOrTill             PaybillOrTill?
   CashbackConfigurationTier CashbackConfigurationTier?
   MerchantLoyaltyReward     MerchantLoyaltyReward?
+
+  @@index([status])
 }
 
 // PaybillOrTill represents payment methods for outlets
@@ -148,6 +178,9 @@ model PaybillOrTill {
   Outlet    Outlet    @relation(fields: [outletId], references: [id])
   Review    Review?   @relation(fields: [reviewId], references: [id])
   reviewId  String?   @unique
+
+  @@index([outletId, isActive, deletedAt])
+  @@index([isActive, deletedAt])
 }
 
 // CashbackConfigurationTier represents different cashback percentage tiers
@@ -161,6 +194,9 @@ model CashbackConfigurationTier {
   CashbackConfiguration   CashbackConfiguration @relation(fields: [cashbackConfigurationId], references: [id])
   Review                  Review?               @relation(fields: [reviewId], references: [id])
   reviewId                String?               @unique
+
+  @@index([cashbackConfigurationId, isActive, deletedAt])
+  @@index([isActive, deletedAt, percentage])
 }
 
 // MerchantLoyaltyReward represents rewards in a loyalty program
@@ -174,4 +210,31 @@ model MerchantLoyaltyReward {
   LoyaltyProgram   LoyaltyProgram @relation(fields: [loyaltyProgramId], references: [id])
   Review           Review?        @relation(fields: [reviewId], references: [id])
   reviewId         String?        @unique
+
+  @@index([loyaltyProgramId, isActive])
+  @@index([isActive])
+}
+
+// pivot table for CashbackConfiguration eligibility
+model CashbackEligibleCustomerType {
+  id                      String                @id @default(uuid())
+  cashbackConfigurationId String
+  customerType            String // "All", "NonCustomer", "New", "Infrequent", "Occasional", "Regular", "VIP"
+  CashbackConfiguration   CashbackConfiguration @relation(fields: [cashbackConfigurationId], references: [id], onDelete: Cascade)
+
+  @@unique([cashbackConfigurationId, customerType])
+  @@index([customerType])
+  @@index([cashbackConfigurationId, customerType])
+}
+
+// pivot table for ExclusiveOffer eligibility
+model ExclusiveOfferEligibleCustomerType {
+  id               String         @id @default(uuid())
+  exclusiveOfferId String
+  customerType     String // "All", "NonCustomer", "New", "Infrequent", "Occasional", "Regular", "VIP"
+  ExclusiveOffer   ExclusiveOffer @relation(fields: [exclusiveOfferId], references: [id], onDelete: Cascade)
+
+  @@unique([exclusiveOfferId, customerType])
+  @@index([customerType])
+  @@index([exclusiveOfferId, customerType])
 }
