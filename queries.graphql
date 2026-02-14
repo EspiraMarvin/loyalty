@@ -1,0 +1,228 @@
+# Test 1: Get All Offers for User-1 (VIP Customer)
+# User-1 is a Regular customer at Merchant 1 and VIP at Merchant 2.
+query GetOffersForUser1 {
+  offers(filter: { userId: "user-1" }) {
+    totalCount
+    outlets {
+      id
+      name
+      Merchant {
+        businessName
+        category
+        LoyaltyProgram {
+          name
+          pointsIssuedLimit
+          pointsUsedInPeriod
+          LoyaltyTiers {
+            name
+            minCustomerType
+          }
+          MerchantLoyaltyRewards {
+            name
+            description
+            pointsCost
+          }
+        }
+      }
+      CashbackConfigurations {
+        name
+        netCashbackBudget
+        usedCashbackBudget
+        startDate
+        endDate
+        CashbackConfigurationTiers {
+          name
+          percentage
+        }
+      }
+      ExclusiveOffers {
+        name
+        description
+        startDate
+        endDate
+        netOfferBudget
+        usedOfferBudget
+      }
+    }
+  }
+}
+# Expected: Should return offers from both merchants (cashback, exclusive, and loyalty programs).
+
+# Test 2: Get All Offers for User-2 (New Customer)
+# User-2 is a New customer at Merchant 1 and Occasional at Merchant 3.
+query GetOffersForUser2 {
+  offers(filter: { userId: "user-2" }) {
+    totalCount
+    outlets {
+      id
+      name
+      Merchant {
+        businessName
+        category
+      }
+      CashbackConfigurations {
+        name
+        CashbackConfigurationTiers {
+          percentage
+        }
+      }
+      ExclusiveOffers {
+        name
+        description
+      }
+    }
+  }
+}
+# Expected: Should include the "New Customer Welcome Offer" (exclusive-1).
+
+# Test 3.a: Filter by Category (Electronics)
+query GetElectronicsOffers {
+  offers(filter: { userId: "user-1", category: "Electronics" }) {
+    totalCount
+    outlets {
+      name
+      Merchant {
+        businessName
+        category
+      }
+      CashbackConfigurations {
+        name
+      }
+      ExclusiveOffers {
+        name
+      }
+    }
+  }
+}
+# Expected: Only outlets from Electronics merchants.
+
+# Test 3.b: Filter by Category (Food & Beverage)
+query GetFoodOffers {
+  offers(filter: { userId: "user-1", category: "Food & Beverage" }) {
+    totalCount
+    outlets {
+      name
+      Merchant {
+        businessName
+        category
+      }
+      CashbackConfigurations {
+        name
+      }
+      ExclusiveOffers {
+        name
+      }
+    }
+  }
+}
+# Expected: Only outlets from Food & Beverage merchants.
+
+# Test 3.c: Filter by Category (Fashion)
+query GetFashionOffers {
+  offers(filter: { userId: "user-1", category: "Fashion" }) {
+    totalCount
+    outlets {
+      name
+      Merchant {
+        businessName
+        category
+      }
+    }
+  }
+}
+
+# Test 4: Filter by Cashback Percentage Range
+query GetHighCashbackOffers {
+  offers(filter: { userId: "user-1", minPercentage: 5, maxPercentage: 15 }) {
+    totalCount
+    outlets {
+      name
+      CashbackConfigurations {
+        name
+        CashbackConfigurationTiers {
+          percentage
+        }
+      }
+    }
+  }
+}
+# Expected: Only offers with cashback between 5% and 15%.
+
+# Test 5: Search by Business Name
+query SearchOffers {
+  offers(filter: { userId: "user-1", search: "Electronics" }) {
+    totalCount
+    outlets {
+      name
+      Merchant {
+        businessName
+      }
+    }
+  }
+}
+# Expected: Only outlets matching "Electronics".
+
+# Test 6: No User (Anonymous - Should See "All" and "NonCustomer" Offers)
+query GetAnonymousOffers {
+  offers(filter: {}) {
+    totalCount
+    outlets {
+      name
+      Merchant {
+        businessName
+      }
+      CashbackConfigurations {
+        name
+      }
+      ExclusiveOffers {
+        name
+      }
+    }
+  }
+}
+# Expected: Only offers with eligibleCustomerTypes: ["All"] or ["NonCustomer"].
+
+# Test 7: Full Details with Loyalty Program
+query GetFullOfferDetails {
+  offers(filter: { userId: "user-1" }) {
+    totalCount
+    outlets {
+      id
+      name
+      description
+      Merchant {
+        businessName
+        category
+        LoyaltyProgram {
+          name
+          pointsIssuedLimit
+          pointsUsedInPeriod
+          LoyaltyTiers {
+            name
+            minCustomerType
+          }
+          MerchantLoyaltyRewards {
+            name
+            pointsCost
+          }
+        }
+      }
+      CashbackConfigurations {
+        name
+        startDate
+        endDate
+        CashbackConfigurationTiers {
+          name
+          percentage
+        }
+      }
+      ExclusiveOffers {
+        name
+        description
+        startDate
+        endDate
+      }
+    }
+  }
+}
+# Expected: Full details including loyalty program tiers and rewards.
