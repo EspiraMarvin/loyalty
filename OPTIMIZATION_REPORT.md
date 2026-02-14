@@ -11,19 +11,21 @@ The original resolver:
 - Used single complex query with nested OR conditions across 3 offer types
 - Relied on array fields for eligibilty (`eligibleCustomerTypes String[]`) - no index & array containment is slow
 
-````prisma
+```prisma
 model CashbackConfiguration {
   eligibleCustomerTypes String[]
 }
+```
+
 - Performed string-based customer type hierarchy checks
 - Had no database indexes for common query patterns
 - No caching layer for frequently accessed data
 
-**Impact**: Query complexity grew exponentially with data volume, creating unacceptable performance.
+Impact: Query complexity grew exponentially with data volume, creating unacceptable performance.
 
 ---
 
-##  Key Optimizations
+## Key Optimizations
 
 ### 1. Array Fields replaced with Join Tables
 
@@ -173,4 +175,3 @@ Impact: Identify queries bottlenecks, production queries insights
 - Database optimized (indexing)
 
 ---
-````
