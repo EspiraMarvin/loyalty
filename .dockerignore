@@ -1,0 +1,46 @@
+# Ignore node_modules (will be installed in container)
+node_modules/
+
+dist/
+
+generated/
+
+# Ignore environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore test coverage
+coverage/
+
+# Ignore build artifacts
+*.tsbuildinfo
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ignore documentation (keep in repo, not in Docker)
+*.md
+!README.md
