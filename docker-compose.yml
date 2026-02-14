@@ -60,17 +60,8 @@ services:
         condition: service_healthy
     networks:
       - loyalty-network
-    command: >
-      sh -c "
-        echo 'Waiting for database to be ready...' &&
-        sleep 5 &&
-        echo 'Syncing database schema...' &&
-        prisma db push --accept-data-loss &&
-        echo 'Seeding database...' &&
-        prisma db seed &&
-        echo 'Starting application...' &&
-        node dist/main
-      "
+    command: > 
+      sh start.sh
 
 volumes:
   postgres_data:

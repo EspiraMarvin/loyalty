@@ -4,16 +4,16 @@ FROM node:22-alpine AS builder
 # Install OpenSSL required by prisma on Alpine
 RUN apk add --no-cache openssl
 
-# Install pnpm
+# install pnpm
 RUN npm install -g pnpm
 
-# Set working directory
+# set working directory
 WORKDIR /app
 
-# Copy package files
+# copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Copy Prisma schema 
+# copy Prisma schema 
 COPY prisma ./prisma
 
 # Install dependencies
@@ -54,6 +54,10 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/node_modules/@types ./node_modules/@types
+
+# Copy startup script and make it executable
+COPY start.sh ./
+RUN chmod +x start.sh
 
 # Copy tsconfig for seed script
 COPY tsconfig.json ./
