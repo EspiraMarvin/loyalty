@@ -36,14 +36,14 @@ Impact: Index-backed lookups, 100% elimination of array containment queries
 // AFTER: Join table with indexes
 @@index([customerType])
 @@index([cashbackConfigurationId, customerType])
-````
+```
 
 ---
 
 ### 2. Numeric Ranks for Hierarchy
 
-Problem: String comparisons for customer type hierarchy ("New" < "Regular" < "VIP")  
-Solution: Added `rank: Int` field (0-5 mapping)  
+Problem: String comparisons for customer type hierarchy ("New" < "Regular" < "VIP")
+Solution: Added `rank: Int` field (0-5 mapping)
 Impact: Single integer comparison `WHERE minRank <= userMaxRank` instead of multiple string checks
 
 ```prisma
@@ -75,8 +75,8 @@ WHERE minRank <= 4  // User rank = 4 (Regular)
 
 ### 3. Split Complex OR into 3 Parallel Queries
 
-Problem: Single query with top-level OR across all offer types - database couldn't optimize  
-Solution: 3 focused queries executed in parallel with `Promise.all`  
+Problem: Single query with top-level OR across all offer types - database couldn't optimize
+Solution: 3 focused queries executed in parallel with `Promise.all`
 Impact: Simpler query plans, optimal index usage per offer type, Map in-memory merging
 
 ```typescript
@@ -119,7 +119,7 @@ Impact: Sequential(reads every row in the table) & Index (uses B trees) scans co
 
 ### 5. Redis Caching (User Context Only)
 
-Problem: Every request fetched user's customer types from database  
+Problem: Every request fetched user's customer types from database
 Solution: Cache user context with 3-minute TTL
 I was assuming user-merchant relationship change rarely hence less complex cache invalidation mechanism
 Impact: higher cache hit rate, eliminates 1 DB query per request
@@ -128,8 +128,8 @@ Impact: higher cache hit rate, eliminates 1 DB query per request
 
 ### 6. DRY Query Building
 
-Problem: Eligibility logic duplicated in `where` and `include.where`  
-Solution: Created `buildCashbackWhere()` and `buildExclusiveOfferWhere()` helper methods  
+Problem: Eligibility logic duplicated in `where` and `include.where`
+Solution: Created `buildCashbackWhere()` and `buildExclusiveOfferWhere()` helper methods
 Impact: Single source of truth, easier maintenance, consistent logic
 
 ---
@@ -141,7 +141,7 @@ Impact: Single source of truth, easier maintenance, consistent logic
 - Slow query logging (> 500ms) in PrismaService
 - Resolver timing via PerformanceLoggingInterceptor
 
-Impact: Identify bottlenecks, monitor regressions, production insights
+Impact: Identify queries bottlenecks, production queries insights
 
 ---
 
@@ -161,7 +161,7 @@ Impact: Identify bottlenecks, monitor regressions, production insights
 
 - Real-time offer availability (offers always fresh)
 - Date ranges respected
-- Budget tracking works (post-query filtering due to Prisma limitation)
+- Budget tracking works
 - Customer type eligibility accurate
 - GraphQL schema backward compatible
 
@@ -173,3 +173,4 @@ Impact: Identify bottlenecks, monitor regressions, production insights
 - Database optimized (indexing)
 
 ---
+````
