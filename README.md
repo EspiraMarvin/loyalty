@@ -4,8 +4,9 @@ A high-performance offers management system built with NestJS, GraphQL, Prisma O
 
 ## Project Overview
 
-This project implements the baseline for the "Offers Resolver Performance Optimization" assessment
-Platform connects users with merchants and their offers across three types:
+This project implements the baseline for the "Offers Resolver Performance Optimization"
+
+- Platform connects users with merchants and their offers across three types:
 
 1. Cashback Configurations - Percentage based cashback on purchases
 2. Exclusive Offers - Special time bound promotions
