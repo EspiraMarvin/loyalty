@@ -44,6 +44,9 @@ importers:
       ioredis:
         specifier: ^5.9.3
         version: 5.9.3
+      k6:
+        specifier: ^0.0.0
+        version: 0.0.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -75,6 +78,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/k6':
+        specifier: ^1.6.0
+        version: 1.6.0
       '@types/node':
         specifier: ^22.10.7
         version: 22.19.11
@@ -1122,6 +1128,9 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/k6@1.6.0':
+    resolution: {integrity: sha512-koixvaHqP241ymqEEgl068kkXek+LhM5YTjysI1ikKUAnmbIKbt8Lngw3nhMHmg3Cihh7viUP/WCIF+FKi4DYQ==}
 
   '@types/long@4.0.2':
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
@@ -2597,6 +2606,9 @@ packages:
 
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
+
+  k6@0.0.0:
+    resolution: {integrity: sha512-GAQSWayS2+LjbH5bkRi+pMPYyP1JSp7o+4j58ANZ762N/RH/SdlAT3CHHztnn8s/xgg8kYNM24Gd2IPo9b5W+g==}
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -4865,6 +4877,8 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/k6@1.6.0': {}
+
   '@types/long@4.0.2': {}
 
   '@types/methods@1.1.4': {}
@@ -6602,6 +6616,8 @@ snapshots:
       universalify: 2.0.1
     optionalDependencies:
       graceful-fs: 4.2.11
+
+  k6@0.0.0: {}
 
   keyv@4.5.4:
     dependencies:
