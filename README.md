@@ -78,11 +78,49 @@ pnpm test:e2e               # Run e2e tests
 
 ## Query tests:
 
-Provided in queries.md [playground_queries.graphql](./queries.graphql)
+Provided in queries.md [queries.graphql](./queries.graphql)
 
 ## Query Optimization Report:
 
 Provided in queries.md [OPTIMIZATION_REPORT.md](./OPTIMIZATION_REPORT.md)
+
+## Bulk Data Loading
+
+```bash
+# Generate sample data (100 merchants, 1000 users by default)
+node generate-sample-data.js
+
+# Generate for (500 merchants, 5000 users)
+node generate-sample-data.js 500 5000
+
+# Load into database
+./load-sample-data.sh docker
+```
+
+## Performance Testing
+
+### Quick Test (30 seconds)
+
+```bash
+# automated benchmark
+./k6-benchmark.sh
+
+# manual benchmark
+k6 run k6-smoke-test.js
+```
+
+### Full Load Test (5.5 minutes, 100 concurrent users)
+
+```bash
+k6 run k6-load-test.js
+```
+
+**Expected Results:**
+
+- Average response: ~300ms (85% faster than baseline)
+- P95: ~500ms (90% faster)
+- Handles 100 concurrent users
+- Error rate < 1%
 
 ### ERD
 
